@@ -1,7 +1,7 @@
-import { getStore } from "@netlify/blobs";
-import { nanoid } from "nanoid";
-import { z } from "zod";
-import JSZip from "jszip";
+const { getStore } = require("@netlify/blobs");
+const { z } = require("zod");
+const JSZip = require("jszip");
+const crypto = require("node:crypto");
 
 const runsStore = getStore("runs");
 
@@ -55,6 +55,7 @@ const productTypeEnum = z.enum([
 const createRunSchema = z.object({
   prompt: z.string().min(1).max(5000),
   productType: productTypeEnum,
+  autoApprove: z.boolean().optional(),
 });
 
 function parsePath(event) {
@@ -260,7 +261,24 @@ async function makeZip(files) {
   return buf;
 }
 
-export async function handler(event) {
+function id() {
+  return crypto.randomUUID().replaceAll("-", "");
+}
+
+async function approveAndGenerate(run) {
+  run.state = { status: "generating" };
+  run.messages.push({ id: id(), ts: now(), agent: "Engineer", kind: "note", text: "Generuju soubory…" });
+  const files = generateFiles(run.productType, run.prompt);
+  const zip = await makeZip(files);
+  run.files = files;
+  run.zipBase64 = zip.toString("base64");
+  run.state = { status: "ready" };
+  run.messages.push({ id: id(), ts: now(), agent: "CEO", kind: "decision", text: "Hotovo. ZIP je připraven." });
+  await saveRun(run);
+  return run;
+}
+
+exports.handler = async function handler(event) {
   const p = parsePath(event);
   const parts = p.split("/").filter(Boolean);
 
@@ -288,30 +306,35 @@ export async function handler(event) {
       const parsed = createRunSchema.safeParse(body);
       if (!parsed.success) return json(400, { error: parsed.error.flatten() });
 
-      const id = nanoid();
+      const runId = id();
       const createdAt = now();
       const messages = [
-        { id: nanoid(), ts: now(), agent: "CEO", kind: "note", text: "Zahajuju interní debatu (Netlify režim)." },
-        { id: nanoid(), ts: now(), agent: "Planner", kind: "note", text: "Navrhnu výstup a počkám na schválení." },
+        { id: id(), ts: now(), agent: "CEO", kind: "note", text: "Zahajuju interní debatu (Netlify režim)." },
+        { id: id(), ts: now(), agent: "Planner", kind: "note", text: "Navrhnu výstup a případně rovnou vygeneruju." },
       ];
       const proposal =
         `Navržený výstup: prototyp pro typ „${parsed.data.productType}“. ` +
         `Po schválení vygeneruju soubory a ZIP.`;
 
       const run = {
-        id,
+        id: runId,
         createdAt,
         prompt: parsed.data.prompt,
         productType: parsed.data.productType,
         state: { status: "awaiting_approval", proposal },
         messages: [
           ...messages,
-          { id: nanoid(), ts: now(), agent: "CEO", kind: "decision", text: `Návrh: ${proposal}` },
+          { id: id(), ts: now(), agent: "CEO", kind: "decision", text: `Návrh: ${proposal}` },
         ],
         files: [],
         zipBase64: null,
       };
       await saveRun(run);
+      const autoApprove = parsed.data.autoApprove ?? true;
+      if (autoApprove) {
+        const ready = await approveAndGenerate(run);
+        return json(200, { id: ready.id, state: ready.state });
+      }
       return json(200, { id: run.id, state: run.state });
     }
     return json(405, { error: "method_not_allowed" });
@@ -341,18 +364,7 @@ export async function handler(event) {
     if (event.httpMethod !== "POST") return json(405, { error: "method_not_allowed" });
     if (run.state?.status !== "awaiting_approval") return json(200, { ok: true, state: run.state });
 
-    run.state = { status: "generating" };
-    run.messages.push({ id: nanoid(), ts: now(), agent: "Engineer", kind: "note", text: "Generuju soubory…" });
-
-    const files = generateFiles(run.productType, run.prompt);
-    const zip = await makeZip(files);
-
-    run.files = files;
-    run.zipBase64 = zip.toString("base64");
-    run.state = { status: "ready" };
-    run.messages.push({ id: nanoid(), ts: now(), agent: "CEO", kind: "decision", text: "Hotovo. ZIP je připraven." });
-
-    await saveRun(run);
+    await approveAndGenerate(run);
     return json(200, { ok: true, state: run.state });
   }
 
@@ -387,5 +399,5 @@ export async function handler(event) {
 
   if (parts[0] === "api" || parts[0] === "") return notFound();
   return notFound();
-}
+};
 

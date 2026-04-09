@@ -106,31 +106,7 @@ function App() {
     logRef.current.scrollTop = logRef.current.scrollHeight
   }, [messages.length, state])
 
-  useEffect(() => {
-    if (!runId) return
-    const es = new EventSource(apiUrl(`/api/runs/${runId}/stream`))
-    const onState = (e: MessageEvent) => {
-      try {
-        setState(JSON.parse(e.data) as RunState)
-      } catch {
-        // ignore
-      }
-    }
-    const onMsg = (e: MessageEvent) => {
-      try {
-        const m = JSON.parse(e.data) as BoardroomMessage
-        setMessages((prev) => (prev.some((x) => x.id === m.id) ? prev : [...prev, m]))
-      } catch {
-        // ignore
-      }
-    }
-    es.addEventListener('state', onState)
-    es.addEventListener('message', onMsg)
-    es.onerror = () => {
-      // keep UI alive even if stream drops
-    }
-    return () => es.close()
-  }, [runId])
+  // Netlify-only mode doesn't use SSE; we load snapshots via REST.
 
   async function refreshRun(id: string) {
     const r = await fetch(apiUrl(`/api/runs/${id}`))
@@ -151,7 +127,7 @@ function App() {
       const r = await fetch(apiUrl('/api/runs'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt, productType }),
+        body: JSON.stringify({ prompt, productType, autoApprove: true }),
       })
       const j = (await r.json()) as { id?: string }
       if (!r.ok || !j.id) throw new Error('Nepodařilo se vytvořit běh.')
