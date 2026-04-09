@@ -29,3 +29,6 @@ apps/**/dist-ssr
 .DS_Store
 *.sw?
 
+
+# Local Netlify folder
+.netlify

@@ -3,6 +3,9 @@
   command = "npm ci && npm ci --prefix apps/web && npm run build --prefix apps/web"
   publish = "apps/web/dist"
 
+[functions]
+  directory = "netlify/functions"
+
 # Netlify Functions (API) — keep frontend calling /api/*
 [[redirects]]
   from = "/api/*"

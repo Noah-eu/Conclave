@@ -19,7 +19,8 @@
   "devDependencies": {
     "@types/jszip": "^3.4.0",
     "concurrently": "^9.2.1",
-    "eslint": "^10.2.0"
+    "eslint": "^10.2.0",
+    "netlify-cli": "^24.10.0"
   },
   "dependencies": {
     "@netlify/blobs": "^10.7.4",

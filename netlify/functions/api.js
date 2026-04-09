@@ -2,8 +2,92 @@ const { getStore } = require("@netlify/blobs");
 const { z } = require("zod");
 const JSZip = require("jszip");
 const crypto = require("node:crypto");
+const fs = require("node:fs/promises");
+const path = require("node:path");
 
-const runsStore = getStore("runs");
+const memory = new Map();
+const runsStore = (() => {
+  try {
+    return getStore("runs");
+  } catch {
+    return null;
+  }
+})();
+
+function memClient() {
+  return {
+    async set(key, value) {
+      memory.set(key, value);
+    },
+    async get(key) {
+      return memory.get(key) ?? null;
+    },
+    async list() {
+      return { blobs: [...memory.keys()].map((k) => ({ key: k })) };
+    },
+  };
+}
+
+function fileClient() {
+  const dir = path.join(process.env.TMPDIR || "/tmp", "conclave-runs");
+  async function ensure() {
+    await fs.mkdir(dir, { recursive: true });
+  }
+  return {
+    async set(key, value) {
+      await ensure();
+      await fs.writeFile(path.join(dir, `${key}.json`), value, "utf8");
+    },
+    async get(key) {
+      try {
+        await ensure();
+        return await fs.readFile(path.join(dir, `${key}.json`), "utf8");
+      } catch {
+        return null;
+      }
+    },
+    async list() {
+      await ensure();
+      const entries = await fs.readdir(dir).catch(() => []);
+      const blobs = entries
+        .filter((n) => n.endsWith(".json"))
+        .map((n) => ({ key: n.slice(0, -5) }));
+      return { blobs };
+    },
+  };
+}
+
+function getStoreClient() {
+  // Prefer Netlify Blobs, but fall back to in-memory if blobs are unavailable/misconfigured (common in local dev).
+  const mem = memClient();
+  const file = fileClient();
+  const isLocal = String(process.env.NETLIFY_DEV || process.env.NETLIFY_LOCAL || "").toLowerCase() === "true";
+  if (isLocal) return file;
+  if (!runsStore) return mem;
+  return {
+    async set(key, value) {
+      try {
+        await runsStore.set(key, value);
+      } catch {
+        await file.set(key, value);
+      }
+    },
+    async get(key, opts) {
+      try {
+        return await runsStore.get(key, opts);
+      } catch {
+        return await file.get(key);
+      }
+    },
+    async list() {
+      try {
+        return await runsStore.list();
+      } catch {
+        return await file.list();
+      }
+    },
+  };
+}
 
 function json(statusCode, body, extraHeaders = {}) {
   return {
@@ -75,17 +159,20 @@ async function readJson(event) {
 }
 
 async function saveRun(run) {
-  await runsStore.set(run.id, JSON.stringify(run));
+  const s = getStoreClient();
+  await s.set(run.id, JSON.stringify(run));
 }
 
 async function loadRun(id) {
-  const raw = await runsStore.get(id, { type: "text" });
+  const s = getStoreClient();
+  const raw = await s.get(id, { type: "text" });
   if (!raw) return null;
   return JSON.parse(raw);
 }
 
 async function listRuns() {
-  const items = await runsStore.list();
+  const s = getStoreClient();
+  const items = await s.list();
   const out = [];
   for (const it of items?.blobs || []) {
     const run = await loadRun(it.key);
