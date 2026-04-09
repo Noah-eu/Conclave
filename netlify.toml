@@ -1,18 +1,18 @@
 [build]
-  base = "apps/web"
-  command = "npm ci && npm run build"
-  publish = "dist"
+  base = "."
+  command = "npm ci && npm ci --prefix apps/web && npm run build --prefix apps/web"
+  publish = "apps/web/dist"
 
-# Optional: if you later move API behind a different origin, keep /api calls working
+# Netlify Functions (API) — keep frontend calling /api/*
 [[redirects]]
   from = "/api/*"
-  to = "${VITE_API_BASE}/api/:splat"
+  to = "/.netlify/functions/api/:splat"
   status = 200
   force = true
 
 [[redirects]]
   from = "/preview/*"
-  to = "${VITE_API_BASE}/preview/:splat"
+  to = "/.netlify/functions/api/preview/:splat"
   status = 200
   force = true
 

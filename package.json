@@ -17,7 +17,14 @@
   "license": "ISC",
   "description": "",
   "devDependencies": {
+    "@types/jszip": "^3.4.0",
     "concurrently": "^9.2.1",
     "eslint": "^10.2.0"
+  },
+  "dependencies": {
+    "@netlify/blobs": "^10.7.4",
+    "jszip": "^3.10.1",
+    "nanoid": "^5.1.7",
+    "zod": "^4.3.6"
   }
 }

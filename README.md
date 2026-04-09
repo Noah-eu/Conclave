@@ -2,11 +2,14 @@
 
 Webová aplikace, kde uživatel zadá **1 prompt** a systém:
 
-- spustí **interní debatu agentů** (stream),
+- spustí **interní debatu agentů**,
 - čeká na **schválení**,
 - následně vygeneruje **reálné soubory** (bundle) + **preview** + **ZIP**.
 
-Součástí je i druhá větev pro **dokumentové úkoly** (PDF / ZIP s PDF) se souhrnem a exporty.
+V repu jsou dvě běhové varianty:
+
+- **Netlify-only (doporučeno pro start)**: API běží jako **Netlify Functions** (persist přes Netlify Blobs).
+- **Node server**: `apps/api` (Express) pro běh mimo Netlify.
 
 ## Spuštění (dev)
 
@@ -41,10 +44,14 @@ Aplikace poběží na `http://localhost:8787/`.
 ## API (rychlý přehled)
 
 - `POST /api/runs` – vytvoří run (debata začne hned)
-- `GET /api/runs/:id/stream` – SSE stream (state + messages)
 - `POST /api/runs/:id/approve` – schválí a vygeneruje soubory + zip
 - `GET /api/runs/:id/download` – stáhne ZIP
 - `GET /preview/:id/` – preview (preferuje `preview/index.html`, jinak `index.html`)
+
+Netlify-only:
+
+- `/api/*` routy obsluhuje `netlify/functions/api.js` (přes `netlify.toml` redirects)
+- `GET /api/runs` – list runů (z Netlify Blobs)
 
 Dokumenty:
 
