@@ -1,0 +1,258 @@
+:root {
+  color-scheme: light;
+  --bg: #0b1220;
+  --panel: rgba(255, 255, 255, 0.06);
+  --panel2: rgba(255, 255, 255, 0.08);
+  --text: #e5e7eb;
+  --muted: #a7b0bf;
+  --border: rgba(255, 255, 255, 0.12);
+  --accent: #7c3aed;
+  --accent2: #22c55e;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: radial-gradient(1200px 600px at 20% 10%, rgba(124, 58, 237, 0.28), transparent 60%),
+    radial-gradient(900px 450px at 80% 20%, rgba(34, 197, 94, 0.18), transparent 65%),
+    var(--bg);
+  color: var(--text);
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial;
+}
+
+.wrap {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 24px 16px 80px;
+}
+
+.topbar {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.brand {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.brand img {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.brand h1 {
+  margin: 0;
+  font-size: 16px;
+  letter-spacing: -0.02em;
+}
+
+.brand .sub {
+  margin: 0;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.tabs {
+  display: inline-flex;
+  gap: 6px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 6px;
+}
+
+.tab {
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.tab.active {
+  background: var(--panel2);
+  border-color: var(--border);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: 12px;
+}
+
+@media (max-width: 980px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px;
+  backdrop-filter: blur(8px);
+}
+
+.title {
+  font-size: 26px;
+  letter-spacing: -0.03em;
+  margin: 0 0 8px;
+}
+
+.muted {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+label {
+  display: block;
+  font-size: 12px;
+  font-weight: 800;
+  margin-bottom: 6px;
+  color: var(--muted);
+}
+
+textarea,
+select,
+input[type='text'],
+input[type='file'] {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: rgba(0, 0, 0, 0.25);
+  color: var(--text);
+  outline: none;
+}
+
+textarea:focus,
+select:focus,
+input[type='text']:focus {
+  border-color: rgba(124, 58, 237, 0.6);
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+@media (max-width: 700px) {
+  .row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.btnrow {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.btn {
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: rgba(0, 0, 0, 0.25);
+  color: var(--text);
+  padding: 10px 12px;
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.btn.primary {
+  border-color: rgba(124, 58, 237, 0.7);
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.95), rgba(99, 102, 241, 0.85));
+}
+
+.btn.good {
+  border-color: rgba(34, 197, 94, 0.7);
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.9), rgba(16, 185, 129, 0.85));
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.log {
+  max-height: 420px;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.msg {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px;
+  background: rgba(0, 0, 0, 0.18);
+}
+
+.msg .meta {
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 6px;
+}
+
+.msg .agent {
+  font-weight: 900;
+  font-size: 12px;
+}
+
+.msg .kind {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.msg pre {
+  margin: 0;
+  white-space: pre-wrap;
+  line-height: 1.45;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+  font-size: 13px;
+}
+
+.split {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.files {
+  max-height: 220px;
+  overflow: auto;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px;
+  background: rgba(0, 0, 0, 0.18);
+}
+
+.files code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+  font-size: 12px;
+}
+
+.frame {
+  width: 100%;
+  height: 520px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: white;
+}
+

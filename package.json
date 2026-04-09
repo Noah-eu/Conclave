@@ -1,0 +1,23 @@
+{
+  "name": "aiboardroom",
+  "version": "1.0.0",
+  "private": true,
+  "main": "index.js",
+  "scripts": {
+    "dev": "concurrently -n api,web -c magenta,cyan \"npm:dev:api\" \"npm:dev:web\"",
+    "dev:api": "npm run dev --prefix apps/api",
+    "dev:web": "npm run dev --prefix apps/web",
+    "build": "npm run build --prefix apps/web && npm run build --prefix apps/api",
+    "preview": "npm run preview --prefix apps/web",
+    "start": "npm run start --prefix apps/api",
+    "test": "echo \"No tests yet\" && exit 0"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "concurrently": "^9.2.1",
+    "eslint": "^10.2.0"
+  }
+}

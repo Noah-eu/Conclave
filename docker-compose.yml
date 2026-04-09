@@ -1,0 +1,15 @@
+services:
+  aiboardroom:
+    build: .
+    ports:
+      - "8787:8787"
+    environment:
+      - PORT=8787
+      - OUT_ROOT=/app/data/runs
+      - WEB_DIST=/app/apps/web/dist
+    volumes:
+      - aiboardroom_data:/app/data
+
+volumes:
+  aiboardroom_data:
+

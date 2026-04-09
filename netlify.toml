@@ -1,0 +1,18 @@
+[build]
+  base = "apps/web"
+  command = "npm ci && npm run build"
+  publish = "dist"
+
+# Optional: if you later move API behind a different origin, keep /api calls working
+[[redirects]]
+  from = "/api/*"
+  to = "${VITE_API_BASE}/api/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/preview/*"
+  to = "${VITE_API_BASE}/preview/:splat"
+  status = 200
+  force = true
+

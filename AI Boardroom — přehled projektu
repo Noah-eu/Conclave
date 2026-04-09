@@ -1,0 +1,81 @@
+AI Boardroom — přehled projektu
+1. Co všechno by apka měla umět
+
+Hlavní cíl:
+uživatel zadá jeden prompt a AI Boardroom sama navrhne řešení, nechá proběhnout interní debatu agentů, po jednom schválení přejde do realizace a vrátí skutečný výstup jako soubory.
+
+A. Hlavní produktová větev
+
+Apka má primárně umět vyrábět:
+
+weby
+
+landing pages
+
+interní nástroje
+
+jednoduché appky
+
+dashboardy
+
+malé MVP nástroje
+
+uploader/processor appky
+
+jednoduché hry / prototypy
+
+Výstup nemá být jen textový návrh, ale:
+
+reálné soubory
+
+použitelný bundle
+
+preview
+
+ideálně později i deploy-ready výstup
+
+B. Druhá produktová větev
+
+Apka má umět i dokumentové úkoly:
+
+PDF
+
+ZIP s více PDF
+
+faktury
+
+reporty
+
+CSV/XLSX exporty
+
+souhrnné HTML/JSON výstupy
+
+C. Dlouhodobě
+
+Později má umět stavět appky, které pak samy řeší další práci:
+
+web na nahrání PDF a převod do tabulek
+
+interní hotelové nástroje
+
+CRM / evidence
+
+formulářové weby
+
+appky napojené na externí služby
+
+D. Integrace do budoucna
+
+Postupně napojit:
+
+Firebase / Supabase
+
+Google Sheets
+
+Resend / e-mail
+
+Stripe
+
+webhooky
+
+OpenAI API
